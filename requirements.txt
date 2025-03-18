@@ -1,0 +1,6 @@
+streamlit
+SpeechRecognition
+groq
+streamlit-chat
+gTTS
+pygame
