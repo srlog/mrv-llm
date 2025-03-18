@@ -4,17 +4,12 @@ import streamlit as st
 import speech_recognition as sr
 from groq import Groq
 from streamlit_chat import message
-from gtts import gTTS
 import tempfile
-import pygame
 
 # Initialize Groq API client
 client = Groq(
     api_key='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',
 )
-
-# Initialize Pygame for audio playback
-pygame.mixer.init()
 
 ACTION_WORDS = {"boil", "chop", "stir", "mix", "add", "serve", "bake", "fry", "blend", "simmer", "pour"}
 
@@ -58,52 +53,7 @@ language_option = st.selectbox(
     index=0,
 )
 
-# Initialize session state for TTS if not set
-if "is_speaking" not in st.session_state:
-    st.session_state["is_speaking"] = False
-
-# --- Audio Control Callback Functions ---
-def stop_audio():
-    pygame.mixer.music.stop()
-    st.session_state["is_speaking"] = False
-
-def pause_audio():
-    pygame.mixer.music.pause()
-
-def resume_audio():
-    pygame.mixer.music.unpause()
-
-# Function to speak text in multiple languages using gTTS for all.
-def speak_text(text):
-    try:
-        # Use gTTS for every language now, including English
-        if language_option == "தமிழ்":
-            tts = gTTS(text, lang="ta")
-        elif language_option == "Français":
-            tts = gTTS(text, lang="fr")
-        elif language_option == "മലയാളം":
-            tts = gTTS(text, lang="ml")
-        elif language_option == "తెలుగు":
-            tts = gTTS(text, lang="te")
-        elif language_option == "ಕನ್ನಡ":
-            tts = gTTS(text, lang="kn")
-        elif language_option == "हिन्दी":
-            tts = gTTS(text, lang="hi")
-        else:
-            tts = gTTS(text, lang="en")
-        
-        # Generate a unique temporary file path for each TTS output
-        temp_audio_path = os.path.join(tempfile.gettempdir(), f"temp_audio_{uuid.uuid4().hex}.mp3")
-        
-        # Save the synthesized speech to the unique temporary file
-        tts.save(temp_audio_path)
-        
-        # Load and play the audio with pygame
-        pygame.mixer.music.load(temp_audio_path)
-        pygame.mixer.music.play()
-        st.session_state["is_speaking"] = True
-    except Exception as e:
-        st.write("❌ TTS Error:", e)
+# --- TTS audio functions removed ---
 
 def get_recipe(recipe_name):
     if language_option == "தமிழ்":
@@ -430,12 +380,7 @@ for i, msg in enumerate(st.session_state.messages):
     if msg["role"] == "user":
         message(msg['content'], is_user=True, key=f'user_{i}', avatar_style="miniavs")
     else:
-        col1, col2 = st.columns([0.9, 0.1])
-        with col1:
-            message(msg['content'], is_user=False, key=f'assistant_{i}', avatar_style="icons")
-        with col2:
-            if st.button("🔊", key=f'speak_{i}'):
-                speak_text(msg['content'])
+        message(msg['content'], is_user=False, key=f'assistant_{i}', avatar_style="icons")
 
 # --- Voice Input Button ---
 if language_option == "English":
@@ -518,13 +463,4 @@ if recipe_name_input and recipe_name_input != st.session_state.recipe_name:
     st.session_state.messages.append({"role": "assistant", "content": recipe_instructions})
     st.rerun()
 
-# --- Audio Control Buttons using on_click Callbacks ---
-st.markdown("---")
-st.write("Audio Controls:")
-col1, col2, col3 = st.columns(3)
-with col1:
-    st.button("⏹ Stop Audio", on_click=stop_audio, key="stop_audio")
-with col2:
-    st.button("⏸ Pause Audio", on_click=pause_audio, key="pause_audio")
-with col3:
-    st.button("▶ Resume Audio", on_click=resume_audio, key="resume_audio")
+# --- Audio control section removed ---
